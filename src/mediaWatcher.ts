@@ -13,8 +13,7 @@ export class MediaWatcher {
     this.run()
   }
 
-  run() {
-    logger.debug(this.path)
+  private run() {
     this.watcher = chokidar.watch(this.path, {
       ignored: /(^|[\/\\])\../, // ignore dotfiles
       persistent: true
