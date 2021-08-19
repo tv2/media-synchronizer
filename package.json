@@ -1,0 +1,34 @@
+{
+  "name": "media-synchronizer",
+  "version": "1.0.0",
+  "description": "Synchronize media files",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tv2/media-synchronizer.git"
+  },
+  "author": {
+    "name": "Jesper Leerberg Madsen",
+    "email": "jlem@tv2.dk"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tv2/media-synchronizer/issues"
+  },
+  "scripts": {
+    "dev": "nodemon ./src",
+    "build": "tsc --build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "standard-version"
+  },
+  "devDependencies": {
+    "@types/node": "16.6.2",
+    "nodemon": "2.0.12",
+    "prettier": "2.3.2",
+    "standard-version": "9.3.1",
+    "ts-node": "10.2.1",
+    "typescript": "4.3.5"
+  },
+  "dependencies": {
+    "winston": "3.3.3"
+  }
+}
