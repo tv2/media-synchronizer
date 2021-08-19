@@ -1,3 +1,7 @@
+import { MediaWatcher } from "./src/mediaWatcher";
 import { logger } from "./src/utilities/logger";
 
-logger.debug('hello world')
+const mediaWatcher = new MediaWatcher({path: './__tests__'})
+
+logger.debug('Media Watcher started')
+mediaWatcher.run()
