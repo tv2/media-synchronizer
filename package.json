@@ -25,6 +25,7 @@
     "release": "standard-version"
   },
   "devDependencies": {
+    "@types/glob": "7.1.4",
     "@types/node": "16.6.2",
     "nodemon": "2.0.12",
     "prettier": "2.3.2",

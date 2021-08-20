@@ -1,6 +1,5 @@
-import { MediaWatcher } from "./src/mediaWatcher";
-import { logger } from "./src/utilities/logger";
+import { eventManager } from "./src/event-manager";
 
-logger.debug('Media Watcher started')
+import './src/consumers'
 
-new MediaWatcher({path: './__tests__'})
+eventManager.emit('setup', null)
