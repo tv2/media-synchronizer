@@ -28,17 +28,17 @@ export class FileTransfererConsumer extends EventConsumer {
     readStream.on('data', (chunk: Buffer) => writeStream.write(chunk) || readStream.pause())
     readStream.on('error', (error) => {
       failed = true
-      emit('transfer-fail', { target, error, stream: 'read' })
+      emit('transfer-fail', { source, target, error, stream: 'read' })
     })
     readStream.on('end', () => writeStream.end())
     writeStream.on('drain', () => readStream.resume())
     writeStream.on('error', (error) => {
       failed = true
       readStream.close()
-      emit('transfer-fail', { target, error, stream: 'write' })
+      emit('transfer-fail', { source, target, error, stream: 'write' })
     })
     writeStream.on('close', () => {
-      !failed && emit('transfer-success', { target })
+      !failed && emit('transfer-success', { source, target })
       delete this.activeTransfers[target]
     })
   }
