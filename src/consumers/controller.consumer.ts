@@ -33,8 +33,11 @@ export class ControllerConsumer extends EventConsumer {
 
   private deleteFile({ data: { path } }: ConsumerEvent) {
     unlink(path.replace(this.sourcePath, this.targetPath), (err) => {
-      if (err) logger.error(err)
-      logger.debug(`File deleted: ${path}`)
+      if (err) {
+        logger.error(err)
+      } else {
+        logger.info(`File deleted: ${path}`)
+      }
     })
   }
 
@@ -51,9 +54,9 @@ export class ControllerConsumer extends EventConsumer {
       try {
         const sourceStat = statSync(sourceFile)
         const targetStat = statSync(targetFile)
-        if (sourceStat.mtime > targetStat.mtime) {
+        if (sourceStat.mtimeMs > targetStat.mtimeMs) {
           // Transfer file
-          emit('transfer-file', { source: sourceFile, target: targetFile })
+          emit('transfer', { source: sourceFile, target: targetFile })
         }
       } catch (err) {
         logger.error(err)

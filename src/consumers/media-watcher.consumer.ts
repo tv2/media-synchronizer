@@ -19,6 +19,7 @@ export class MediaWatcherConsumer extends EventConsumer {
 
   private setup({ emit }: ConsumerEvent) {
     this.watcher = chokidar.watch(this.sourcePath, {
+      ignored: /(node_modules|(^|[\/\\])\..)/, // ignore dotfiles
       persistent: true,
     })
 
