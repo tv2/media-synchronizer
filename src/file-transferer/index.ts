@@ -18,7 +18,7 @@ export class FileTransferer {
   transferFile(source: string, target: string, emit: any) {
     const readStream = createReadStream(source)
     const writeStream = createWriteStream(target, {
-      highWaterMark: 100 * 1024,
+      highWaterMark: 100 * 1024, // 100KB
     })
     let failed: boolean = false
     // TODO: Stop any previous streams for this id.
