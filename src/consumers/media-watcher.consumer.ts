@@ -3,7 +3,6 @@ import * as chokidar from 'chokidar'
 
 export class MediaWatcherConsumer extends EventConsumer {
   protected watcher: any
-  protected glob: any
   protected sourcePath: string
 
   constructor(options: {
