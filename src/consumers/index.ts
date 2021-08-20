@@ -2,6 +2,7 @@ import { register } from "../event-manager";
 import { MediaWatcherConsumer } from "./media-watcher.consumer";
 import { ControllerConsumer } from "./controller.consumer"
 import { resolve } from "path";
+import { FileTransfererConsumer } from "./file-transferer.consumer";
 
 const sourcePath = resolve('./__source__')
 const targetPath = resolve('./__target__')
@@ -14,3 +15,6 @@ const controller = new ControllerConsumer({sourcePath: sourcePath, targetPath: t
 register('file-added', controller)
 register('file-changed', controller)
 register('file-deleted', controller)
+
+const fileTransferer = new FileTransfererConsumer()
+register('transfer', fileTransferer)

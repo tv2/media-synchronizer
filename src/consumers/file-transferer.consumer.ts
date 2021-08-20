@@ -1,9 +1,11 @@
 import { createReadStream, createWriteStream } from 'fs'
+import { EventConsumer } from '../lib/events'
 
-export class FileTransferer {
+export class FileTransfererConsumer extends EventConsumer {
   protected activeTransfers: any
 
   constructor() {
+    super()
     this.activeTransfers = {}
   }
 
