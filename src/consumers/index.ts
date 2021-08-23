@@ -10,6 +10,7 @@ import { normalizePath } from '../lib/utilities/filesystem'
 
 const sourcePath = normalizePath(resolve(process.env.SOURCE_PATH || './__source__'))
 const targetPath = normalizePath(resolve(process.env.TARGET_PATH || './__target__'))
+const watchFileDeletion = (process.env.WATCH_FILE_DELETION || 'false') === 'true'
 
 logger.info(`Starting up ${name}`)
 logger.info(`Version: ${version}`)
@@ -18,10 +19,10 @@ logger.info(`SOURCE_PATH: ${sourcePath}`)
 logger.info(`TARGET_PATH: ${targetPath}`)
 
 // Setup media watcher
-const mediaWatcher = new MediaWatcherConsumer({ sourcePath: sourcePath })
+const mediaWatcher = new MediaWatcherConsumer({ sourcePath, watchFileDeletion })
 register('setup', mediaWatcher)
 
-const controller = new ControllerConsumer({ sourcePath: sourcePath, targetPath: targetPath })
+const controller = new ControllerConsumer({ sourcePath, targetPath })
 register('file-added', controller)
 register('file-changed', controller)
 register('file-deleted', controller)

@@ -4,10 +4,12 @@ import * as chokidar from 'chokidar'
 export class MediaWatcherConsumer extends EventConsumer {
   protected watcher: any
   protected sourcePath: string
+  protected watchFileDeletion: boolean
 
-  constructor(options: { sourcePath: string }) {
+  constructor(options: { sourcePath: string, watchFileDeletion: boolean }) {
     super()
     this.sourcePath = options.sourcePath
+    this.watchFileDeletion = options.watchFileDeletion
   }
 
   consume({ event, data, emit }: ConsumerEvent) {
@@ -26,6 +28,9 @@ export class MediaWatcherConsumer extends EventConsumer {
     this.watcher
       .on('add', (path: string) => emit('file-added', { path }))
       .on('change', (path: string) => emit('file-changed', { path }))
-      .on('unlink', (path: string) => emit('file-deleted', { path }))
+
+    if (this.watchFileDeletion) {
+      this.watcher.on('unlink', (path: string) => emit('file-deleted', { path }))
+    }
   }
 }
