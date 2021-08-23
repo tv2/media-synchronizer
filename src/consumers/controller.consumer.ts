@@ -3,6 +3,7 @@ import { statSync, unlink, existsSync, mkdirSync } from 'fs'
 import { convertPath } from '../lib/utilities/filesystem'
 import { dirname } from 'path'
 import { logger } from '../lib/utilities/logger'
+import { volume } from '../lib/utilities/filesystem'
 
 export class ControllerConsumer extends EventConsumer {
   protected targetPath: string
@@ -81,8 +82,8 @@ export class ControllerConsumer extends EventConsumer {
     }
 
     // Check if targetPath drive, volume or share exsists
-    if (!existsSync(targetPath)) {
-      logger.error(`Exiting program: Target path drive, volume or share does not exsist: ${targetPath})`)
+    if (!existsSync(volume(targetPath))) {
+      logger.error(`Exiting program: Target path, drive, volume or share does not exsist: ${targetPath}`)
       process.exit(9)
     }
   }
