@@ -72,7 +72,7 @@ export class ControllerConsumer extends EventConsumer {
       }
     } else {
       // Transfer file
-      logger.debug('Transfer event sent: New file will be added to targetSoruce')
+      logger.debug(`Transfer event sent: New file will be added to target path: ${targetFile}`)
       emit('transfer', { source: sourceFile, target: targetFile })
     }
   }
