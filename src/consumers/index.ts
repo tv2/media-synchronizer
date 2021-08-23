@@ -6,9 +6,10 @@ import { FileTransfererConsumer } from './file-transferer.consumer'
 import { logger } from '../lib/utilities/logger'
 import { name, version } from '../../package.json'
 import { environment } from '../lib/utilities/environment'
+import { normalizePath } from '../lib/utilities/filesystem'
 
-const sourcePath = resolve(process.env.SOURCE_PATH || './__source__')
-const targetPath = resolve(process.env.TARGET_PATH || './__target__')
+const sourcePath = normalizePath(resolve(process.env.SOURCE_PATH || './__source__'))
+const targetPath = normalizePath(resolve(process.env.TARGET_PATH || './__target__'))
 
 logger.info(`Starting up ${name}`)
 logger.info(`Version: ${version}`)
