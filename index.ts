@@ -1,4 +1,4 @@
-import { eventManager } from "./src/event-manager";
+import { eventManager } from './src/event-manager'
 
 import './src/consumers'
 

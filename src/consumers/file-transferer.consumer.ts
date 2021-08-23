@@ -1,5 +1,6 @@
 import { createReadStream, createWriteStream } from 'fs'
 import { EventConsumer } from '../lib/events'
+import { logger } from '../lib/utilities/logger'
 
 export class FileTransfererConsumer extends EventConsumer {
   protected activeTransfers: any
@@ -10,6 +11,10 @@ export class FileTransfererConsumer extends EventConsumer {
   }
 
   consume({ event, data, emit }: any) {
+    logger.debug(`FileTransfererConsumer event: ${event}`)
+    logger.debug('FileTransfererConsumer data:')
+    logger.debug(data)
+
     switch (event) {
       case 'transfer':
         this.transferFile(data.source, data.target, emit)
