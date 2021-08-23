@@ -1,1 +1,2 @@
-$‘# Ignore artifactsndistncoverage’
+*.json
+*.yaml
