@@ -5,11 +5,16 @@ import { dirname } from 'path'
 import { logger } from '../lib/utilities/logger'
 import { volume } from '../lib/utilities/filesystem'
 
+export interface IControllerConsumer {
+  targetPath: string
+  sourcePath: string
+}
+
 export class ControllerConsumer extends EventConsumer {
   protected targetPath: string
   protected sourcePath: string
 
-  constructor(options: { targetPath: string; sourcePath: string }) {
+  constructor(options: IControllerConsumer) {
     super()
     this.targetPath = options.targetPath
     this.sourcePath = options.sourcePath

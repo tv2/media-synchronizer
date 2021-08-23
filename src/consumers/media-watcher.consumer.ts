@@ -1,15 +1,20 @@
 import { ConsumerEvent, EventConsumer } from '../lib/events'
 import * as chokidar from 'chokidar'
 
+export interface IMediaWatcherConsumer {
+  sourcePath: string
+  watchFileDeletion?: boolean
+}
+
 export class MediaWatcherConsumer extends EventConsumer {
   protected watcher: any
   protected sourcePath: string
   protected watchFileDeletion: boolean
 
-  constructor(options: { sourcePath: string, watchFileDeletion: boolean }) {
+  constructor(options: IMediaWatcherConsumer) {
     super()
     this.sourcePath = options.sourcePath
-    this.watchFileDeletion = options.watchFileDeletion
+    this.watchFileDeletion = options.watchFileDeletion || false
   }
 
   consume({ event, data, emit }: ConsumerEvent) {
