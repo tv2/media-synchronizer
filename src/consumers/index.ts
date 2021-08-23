@@ -3,9 +3,10 @@ import { MediaWatcherConsumer } from './media-watcher.consumer'
 import { ControllerConsumer } from './controller.consumer'
 import { resolve } from 'path'
 import { FileTransfererConsumer } from './file-transferer.consumer'
+import { normalizePath } from '../lib/utilities/filesystem'
 
-const sourcePath = resolve(process.env.SOURCE_PATH || './__source__')
-const targetPath = resolve(process.env.TARGET_PATH || './__target__')
+const sourcePath = normalizePath(resolve(process.env.SOURCE_PATH || './__source__'))
+const targetPath = normalizePath(resolve(process.env.TARGET_PATH || './__target__'))
 
 // Setup media watcher
 const mediaWatcher = new MediaWatcherConsumer({ sourcePath: sourcePath })

@@ -1,5 +1,6 @@
 import { ConsumerEvent, EventConsumer } from '../lib/events'
 import { statSync, unlink, existsSync, mkdirSync } from 'fs'
+import { convertPath } from '../lib/utilities/filesystem'
 import { dirname } from 'path'
 import { logger } from '../lib/utilities/logger'
 
@@ -32,7 +33,7 @@ export class ControllerConsumer extends EventConsumer {
   }
 
   private deleteFile({ data: { path } }: ConsumerEvent) {
-    unlink(path.replace(this.sourcePath, this.targetPath), (err) => {
+    unlink(convertPath(path, this.sourcePath, this.targetPath), (err) => {
       if (err) {
         logger.error(err)
       } else {
@@ -43,7 +44,7 @@ export class ControllerConsumer extends EventConsumer {
 
   private addFile({ data: { path }, emit }: ConsumerEvent) {
     const sourceFile = path
-    const targetFile = path.replace(this.sourcePath, this.targetPath)
+    const targetFile = convertPath(path, this.sourcePath, this.targetPath)
     // Ensure target directory
     const targetDir = dirname(targetFile)
     if (!existsSync(targetDir)) {
