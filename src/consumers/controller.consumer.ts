@@ -12,6 +12,7 @@ export class ControllerConsumer extends EventConsumer {
     super()
     this.targetPath = options.targetPath
     this.sourcePath = options.sourcePath
+    this.validatePaths()
   }
 
   consume({ event, data, emit }: ConsumerEvent): void {
@@ -32,8 +33,8 @@ export class ControllerConsumer extends EventConsumer {
     }
   }
 
-  private deleteFile({ data: { path } }: ConsumerEvent) {
-    unlink(convertPath(path, this.sourcePath, this.targetPath), (err) => {
+  private deleteFile({ data: { path } }: ConsumerEvent): void {
+    unlink(path.replace(this.sourcePath, this.targetPath), (err) => {
       if (err) {
         logger.error(err)
       } else {
@@ -57,6 +58,7 @@ export class ControllerConsumer extends EventConsumer {
         const targetStat = statSync(targetFile)
         if (sourceStat.mtimeMs > targetStat.mtimeMs) {
           // Transfer file
+          logger.debug('Transfer event sent: Source file has been updated')
           emit('transfer', { source: sourceFile, target: targetFile })
         }
       } catch (err) {
@@ -64,7 +66,24 @@ export class ControllerConsumer extends EventConsumer {
       }
     } else {
       // Transfer file
+      logger.debug('Transfer event sent: New file will be added to targetSoruce')
       emit('transfer', { source: sourceFile, target: targetFile })
+    }
+  }
+
+  private validatePaths(): void {
+    const sourcePath = this.sourcePath
+    const targetPath = this.targetPath
+
+    if (!existsSync(sourcePath)) {
+      logger.error(`Exiting program: Source path does not exsist: ${sourcePath}`)
+      process.exit(9)
+    }
+
+    // Check if targetPath drive, volume or share exsists
+    if (!existsSync(targetPath)) {
+      logger.error(`Exiting program: Target path drive, volume or share does not exsist: ${targetPath})`)
+      process.exit(9)
     }
   }
 }

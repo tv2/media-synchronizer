@@ -1,7 +1,7 @@
 export interface ConsumerEvent {
-  event: string,
-  data: any,
-  emit(event: string, data?: any): void,
+  event: string
+  data: any
+  emit(event: string, data?: any): void
 }
 
 export abstract class EventConsumer {
