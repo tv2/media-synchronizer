@@ -8,17 +8,27 @@ import { volume } from '../lib/utilities/filesystem'
 export interface IControllerConsumer {
   targetPath: string
   sourcePath: string
+  retransferInterval?: bigint
+  numberOfRetransfers?: bigint
 }
 
 export class ControllerConsumer extends EventConsumer {
   protected targetPath: string
   protected sourcePath: string
+  protected retransferTimer: NodeJS.Timer
+  protected retransferCache: {
+    [key: string]: { data: { source: string; target: string }; attempts: number; emit: Function; emitted: boolean }
+  }
+  protected numberOfRetransfers: number
 
   constructor(options: IControllerConsumer) {
     super()
     this.targetPath = options.targetPath
     this.sourcePath = options.sourcePath
     this.validatePaths()
+    this.retransferCache = {}
+    this.retransferTimer = setInterval(() => this.retransfer(), Number(options.retransferInterval) || 10 * 1000)
+    this.numberOfRetransfers = Number(options.numberOfRetransfers) || 3
   }
 
   consume({ event, data, emit }: ConsumerEvent): void {
@@ -34,8 +44,37 @@ export class ControllerConsumer extends EventConsumer {
         logger.info(`Transfered file ${data.target}`)
         break
       case 'transfer-fail':
+        this.cacheForRetransfer(data, emit)
         logger.error(`Failed to transfer file ${data.target} due to ${data.stream} stream: ${data.error}`)
         break
+    }
+  }
+
+  private retransfer() {
+    Object.entries(this.retransferCache).forEach(([_, cache]) => {
+      if (cache.emitted) return
+      logger.debug(`Trying retransfer of ${cache.data.target}`)
+      cache.emitted = true
+      cache.emit('transfer', cache.data)
+    })
+  }
+
+  private cacheForRetransfer(data: any, emit: any) {
+    if (data.target in this.retransferCache) {
+      if (this.retransferCache[data.target].attempts >= this.numberOfRetransfers) {
+        logger.warn(`Maximum retransfer tries reached for file: ${data.target}`)
+        delete this.retransferCache[data.target]
+        return
+      }
+      this.retransferCache[data.target].emitted = false
+      this.retransferCache[data.target].attempts++
+      return
+    }
+    this.retransferCache[data.target] = {
+      data: { source: data.source, target: data.target },
+      emit,
+      attempts: 0,
+      emitted: false,
     }
   }
 
