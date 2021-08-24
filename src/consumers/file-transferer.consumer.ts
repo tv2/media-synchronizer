@@ -12,8 +12,7 @@ export class FileTransfererConsumer extends EventConsumer {
 
   consume({ event, data, emit }: any) {
     logger.debug(`FileTransfererConsumer event: ${event}`)
-    logger.debug('FileTransfererConsumer data:')
-    logger.debug(data)
+    logger.debug('FileTransfererConsumer data: ', data)
 
     switch (event) {
       case 'transfer':

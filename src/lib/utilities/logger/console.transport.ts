@@ -1,12 +1,21 @@
 import { transports, format as wformat } from 'winston'
 import { environment, Environment } from '../environment'
 
-const prettyJson = wformat.printf((info) => {
-  if (typeof info.message === 'object') {
-    console.log('')
-    console.log(info.message)
-    return ''
+function transform(info: any) {
+  const args = info[Symbol.for('splat')]
+  if (args) {
+    if (typeof args[0] === 'object') {
+      console.log(args[0])
+    }
   }
+  return info
+}
+
+function utilFormatter() {
+  return { transform }
+}
+
+const prettyJson = wformat.printf((info) => {
   return `[ ${info.timestamp} ] [ ${info.level} ]  ${info.message}`
 })
 
@@ -16,9 +25,9 @@ const format =
         wformat.timestamp(),
         wformat.colorize(),
         wformat.prettyPrint(),
-        wformat.splat(),
         wformat.simple(),
-        prettyJson
+        prettyJson,
+        utilFormatter()
       )
     : wformat.combine(wformat.timestamp(), wformat.json())
 
