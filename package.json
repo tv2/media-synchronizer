@@ -19,7 +19,7 @@
     "start": "cross-env NODE_ENV=production node ./dist",
     "clean": "rimraf ./dist",
     "reset": "yarn clean && rimraf ./node_modules",
-    "build": "tsc --build",
+    "build": "tsc --build && ts-node __tools__/dist-package.ts",
     "test": "echo \"fine\"",
     "validate:dependencies": "yarn audit --groups dependencies"
   },

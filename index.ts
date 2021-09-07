@@ -1,4 +1,7 @@
 import { eventManager } from './src/event-manager'
+import { setupEnvironment } from './src/loaders'
+
+setupEnvironment()
 
 import './src/consumers'
 
