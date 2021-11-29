@@ -6,3 +6,5 @@ setupEnvironment()
 import './src/consumers'
 
 eventManager.emit('setup', null)
+
+import './src/api'

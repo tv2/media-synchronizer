@@ -12,13 +12,20 @@ export interface IControllerConsumer {
   numberOfRetransfers?: bigint
 }
 
+export interface IOnAirQueueObject {
+  eventName: string
+  eventData: any
+}
+
 export class ControllerConsumer extends EventConsumer {
   protected targetPath: string
   protected sourcePath: string
   protected retransferTimer: NodeJS.Timer
+  protected isOnAir: boolean
   protected retransferCache: {
     [key: string]: { data: { source: string; target: string }; attempts: number; emit: Function; emitted: boolean }
   }
+  protected onAirQueue: Array<any>
   protected numberOfRetransfers: number
 
   constructor(options: IControllerConsumer) {
@@ -27,18 +34,34 @@ export class ControllerConsumer extends EventConsumer {
     this.sourcePath = options.sourcePath
     this.validatePaths()
     this.retransferCache = {}
+    this.isOnAir = false
+    this.onAirQueue = []
     this.retransferTimer = setInterval(() => this.retransfer(), Number(options.retransferInterval) || 10 * 1000)
     this.numberOfRetransfers = Number(options.numberOfRetransfers) || 3
   }
 
   consume({ event, data, emit }: ConsumerEvent): void {
     switch (event) {
+      case 'on-air':
+        this.setOnAir()
+        break
+      case 'off-air':
+        this.setOffAir(emit)
+        break
       case 'file-changed':
       case 'file-added':
-        this.addFile({ event, data, emit })
+        if (this.isOnAir) {
+          this.addToOnAirQueue(event, data)
+        } else {
+          this.addFile({ event, data, emit })
+        }
         break
       case 'file-deleted':
-        this.deleteFile({ event, data, emit })
+        if (this.isOnAir) {
+          this.addToOnAirQueue(event, data)
+        } else {
+          this.deleteFile({ event, data, emit })
+        }
         break
       case 'transfer-success':
         logger.info(`Transfered file ${data.target}`)
@@ -48,6 +71,32 @@ export class ControllerConsumer extends EventConsumer {
         logger.error(`Failed to transfer file ${data.target} due to ${data.stream} stream: ${data.error}`)
         break
     }
+  }
+
+  private addToOnAirQueue(eventName: string, eventData: any) {
+    const onAirQueueObject: IOnAirQueueObject = {
+      eventName: eventName,
+      eventData: eventData
+    }
+    this.onAirQueue.push(onAirQueueObject)
+  }
+
+  private setOnAir() {
+    this.isOnAir = true
+    logger.debug(`Setting OnAir: ${this.isOnAir}`)
+  }
+
+  private setOffAir(emit: any) {
+    this.isOnAir = false
+    logger.debug(`Setting OnAir: ${this.isOnAir}`)
+
+    logger.debug(`OnAirQueue length: ${this.onAirQueue.length}`)
+
+    this.onAirQueue.forEach(element => {
+      logger.info(`Resending event: ${element.eventName} path: ${element.eventData.path}`)
+      emit(element.eventName, {path: element.eventData.path})
+    });
+    this.onAirQueue = []
   }
 
   private retransfer() {

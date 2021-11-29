@@ -27,6 +27,8 @@ register('file-changed', controller)
 register('file-deleted', controller)
 register('transfer-success', controller)
 register('transfer-fail', controller)
+register('on-air', controller)
+register('off-air', controller)
 
 const fileTransferer = new FileTransfererConsumer()
 register('transfer', fileTransferer)
