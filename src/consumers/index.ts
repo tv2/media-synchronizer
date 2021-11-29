@@ -3,9 +3,10 @@ import { MediaWatcherConsumer } from './media-watcher.consumer'
 import { ControllerConsumer } from './controller.consumer'
 import { resolve } from 'path'
 import { FileTransfererConsumer } from './file-transferer.consumer'
-import { logger } from '../lib/utilities/logger'
+import { logger } from '../utilities/logger'
 import { name, version } from '../../package.json'
-import { environment } from '../lib/utilities/environment'
+import { environment } from '../utilities/environment'
+import { APIConsumer } from './api.consumer'
 
 const sourcePath = resolve(process.env.SOURCE_PATH || './__source__')
 const targetPath = resolve(process.env.TARGET_PATH || './__target__')
@@ -32,3 +33,6 @@ register('off-air', controller)
 
 const fileTransferer = new FileTransfererConsumer()
 register('transfer', fileTransferer)
+
+const apiServer = new APIConsumer({ port: BigInt(process.env.PORT ?? '6996') })
+register('setup', apiServer)

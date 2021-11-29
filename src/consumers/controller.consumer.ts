@@ -1,9 +1,9 @@
-import { ConsumerEvent, EventConsumer } from '../lib/events'
+import { ConsumerEvent, EventConsumer } from '../utilities/events'
 import { statSync, unlink, existsSync, mkdirSync } from 'fs'
-import { convertPath } from '../lib/utilities/filesystem'
+import { convertPath } from '../utilities/filesystem'
 import { dirname } from 'path'
-import { logger } from '../lib/utilities/logger'
-import { volume } from '../lib/utilities/filesystem'
+import { logger } from '../utilities/logger'
+import { volume } from '../utilities/filesystem'
 
 export interface IControllerConsumer {
   targetPath: string
@@ -22,6 +22,8 @@ export class ControllerConsumer extends EventConsumer {
   protected sourcePath: string
   protected retransferTimer: NodeJS.Timer
   protected isOnAir: boolean
+  protected onAirEndTime: number
+  protected onAirTimer: NodeJS.Timer | null = null
   protected retransferCache: {
     [key: string]: { data: { source: string; target: string }; attempts: number; emit: Function; emitted: boolean }
   }
@@ -35,6 +37,7 @@ export class ControllerConsumer extends EventConsumer {
     this.validatePaths()
     this.retransferCache = {}
     this.isOnAir = false
+    this.onAirEndTime = 0
     this.onAirQueue = []
     this.retransferTimer = setInterval(() => this.retransfer(), Number(options.retransferInterval) || 10 * 1000)
     this.numberOfRetransfers = Number(options.numberOfRetransfers) || 3
@@ -43,18 +46,20 @@ export class ControllerConsumer extends EventConsumer {
   consume({ event, data, emit }: ConsumerEvent): void {
     switch (event) {
       case 'on-air':
-        this.setOnAir()
+        this.setOnAir({ event, data, emit })
         break
       case 'off-air':
         this.setOffAir(emit)
         break
       case 'file-changed':
-      case 'file-added':
         if (this.isOnAir) {
           this.addToOnAirQueue(event, data)
         } else {
           this.addFile({ event, data, emit })
         }
+        break
+      case 'file-added':
+        this.addFile({ event, data, emit })
         break
       case 'file-deleted':
         if (this.isOnAir) {
@@ -76,26 +81,42 @@ export class ControllerConsumer extends EventConsumer {
   private addToOnAirQueue(eventName: string, eventData: any) {
     const onAirQueueObject: IOnAirQueueObject = {
       eventName: eventName,
-      eventData: eventData
+      eventData: eventData,
     }
     this.onAirQueue.push(onAirQueueObject)
   }
 
-  private setOnAir() {
+  private setOnAir({ data, emit }: ConsumerEvent) {
     this.isOnAir = true
-    logger.debug(`Setting OnAir: ${this.isOnAir}`)
+    this.onAirEndTime = Number(data.endTime)
+    this.onAirTimer = setInterval(() => {
+      if (this.onAirEndTime > Date.now()) {
+        return
+      }
+      this.setOffAir(emit)
+    }, 60000)
+    logger.info(`Is now On Air.`)
   }
 
   private setOffAir(emit: any) {
+    if (!this.isOnAir) {
+      logger.debug('Already Off Air!')
+      return
+    }
     this.isOnAir = false
-    logger.debug(`Setting OnAir: ${this.isOnAir}`)
+    logger.info(`Is now Off Air.`)
+
+    if (this.onAirTimer !== null) {
+      clearInterval(this.onAirTimer)
+      logger.trace('Cleared onAirTimer.')
+    }
 
     logger.debug(`OnAirQueue length: ${this.onAirQueue.length}`)
 
-    this.onAirQueue.forEach(element => {
+    this.onAirQueue.forEach((element) => {
       logger.info(`Resending event: ${element.eventName} path: ${element.eventData.path}`)
-      emit(element.eventName, {path: element.eventData.path})
-    });
+      emit(element.eventName, { path: element.eventData.path })
+    })
     this.onAirQueue = []
   }
 

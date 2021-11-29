@@ -1,6 +1,6 @@
 import { createReadStream, createWriteStream } from 'fs'
-import { EventConsumer } from '../lib/events'
-import { logger } from '../lib/utilities/logger'
+import { EventConsumer } from '../utilities/events'
+import { logger } from '../utilities/logger'
 
 export class FileTransfererConsumer extends EventConsumer {
   protected activeTransfers: any

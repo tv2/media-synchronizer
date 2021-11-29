@@ -1,5 +1,5 @@
-import { EventManager } from './lib/events/event-manager.class'
-import { EventConsumer } from './lib/events/event-consumer.class'
+import { EventManager } from './utilities/events/event-manager.class'
+import { EventConsumer } from './utilities/events/event-consumer.class'
 
 export const eventManager = new EventManager()
 
