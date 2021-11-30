@@ -75,10 +75,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.2.tgz#423c77877d0569db20e1fc80885ac4118314010e"
   integrity sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==
 
-"@tv2media/logger@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@tv2media/logger/-/logger-1.1.0.tgz#3099b3a1ac26dde7176cca4e65db0ecc4f158a6a"
-  integrity sha512-NoqctIt5idYuJfYiotPmyV987o4Neq3dWHjsHx+kWJOAzZlqnUnwy5t4TFFuZO3xDA/vTjT/4HM8UBT1fneKgg==
+"@tv2media/logger@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@tv2media/logger/-/logger-1.2.0.tgz#977567208778647db7343d34c84064a2bddee6e7"
+  integrity sha512-tSQVTSBUWANZGvlp/RURUy5Ib3XYFUxaoQ6rRyaDT3im2sVEl2eC4XrOwwB0wBmiK87csnoTuSCXw+CNBhEEdQ==
 
 "@types/body-parser@*", "@types/body-parser@1.19.2":
   version "1.19.2"
