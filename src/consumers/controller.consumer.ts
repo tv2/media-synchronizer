@@ -10,6 +10,7 @@ export interface IControllerConsumer {
   sourcePath: string
   retransferInterval?: bigint
   numberOfRetransfers?: bigint
+  onAirIdleDuration?: bigint
 }
 
 export interface IOnAirQueueObject {
@@ -24,6 +25,7 @@ export class ControllerConsumer extends EventConsumer {
   protected isOnAir: boolean
   protected onAirEndTime: number
   protected onAirTimer: NodeJS.Timer | null = null
+  protected onAirIdleDuration: BigInt
   protected retransferCache: {
     [key: string]: { data: { source: string; target: string }; attempts: number; emit: Function; emitted: boolean }
   }
@@ -41,6 +43,7 @@ export class ControllerConsumer extends EventConsumer {
     this.onAirQueue = []
     this.retransferTimer = setInterval(() => this.retransfer(), Number(options.retransferInterval) || 10 * 1000)
     this.numberOfRetransfers = Number(options.numberOfRetransfers) || 3
+    this.onAirIdleDuration = options.onAirIdleDuration ?? 60000n
   }
 
   consume({ event, data, emit }: ConsumerEvent): void {
@@ -89,12 +92,15 @@ export class ControllerConsumer extends EventConsumer {
   private setOnAir({ data, emit }: ConsumerEvent) {
     this.isOnAir = true
     this.onAirEndTime = Number(data.endTime)
+    if (this.onAirTimer !== null) {
+      clearInterval(this.onAirTimer)
+    }
     this.onAirTimer = setInterval(() => {
       if (this.onAirEndTime > Date.now()) {
         return
       }
       this.setOffAir(emit)
-    }, 60000)
+    }, Number(this.onAirIdleDuration))
     logger.info(`Is now On Air.`)
   }
 
