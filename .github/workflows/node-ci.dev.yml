@@ -109,7 +109,7 @@ jobs:
         with:
           images: "tv2media/${{ github.event.repository.name }}"
           tags: |
-            ${{steps.version.outputs.prop}}-type=ref,event=tag
+            type=ref,event=branch
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1

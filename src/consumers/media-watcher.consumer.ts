@@ -1,4 +1,4 @@
-import { ConsumerEvent, EventConsumer } from '../lib/events'
+import { ConsumerEvent, EventConsumer } from '../utilities/events'
 import * as chokidar from 'chokidar'
 
 export interface IMediaWatcherConsumer {

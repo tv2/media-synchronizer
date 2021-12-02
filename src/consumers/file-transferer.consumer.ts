@@ -1,7 +1,7 @@
 import { createReadStream, createWriteStream } from 'fs'
-import { EventConsumer } from '../lib/events'
-import { logger } from '../lib/utilities/logger'
-
+import { EventConsumer } from '../utilities/events'
+import { logger as baseLogger } from '../utilities/logger'
+const logger = baseLogger.tag('File transferer consumer')
 export class FileTransfererConsumer extends EventConsumer {
   protected activeTransfers: any
 
@@ -11,8 +11,7 @@ export class FileTransfererConsumer extends EventConsumer {
   }
 
   consume({ event, data, emit }: any) {
-    logger.debug(`FileTransfererConsumer event: ${event}`)
-    logger.debug('FileTransfererConsumer data: ', data)
+    logger.data(data).debug(`FileTransfererConsumer event: ${event}`)
 
     switch (event) {
       case 'transfer':
@@ -37,6 +36,7 @@ export class FileTransfererConsumer extends EventConsumer {
     readStream.on('end', () => writeStream.end())
     writeStream.on('drain', () => readStream.resume())
     writeStream.on('error', (error) => {
+      logger.data(error).error('Error in writeStream')
       failed = true
       readStream.close()
       emit('transfer-fail', { source, target, error, stream: 'write' })
