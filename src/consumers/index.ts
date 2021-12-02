@@ -17,6 +17,7 @@ logger.info(`Version: ${version}`)
 logger.info(`Environment: ${environment}`)
 logger.info(`SOURCE_PATH: ${sourcePath}`)
 logger.info(`TARGET_PATH: ${targetPath}`)
+logger.info(`Watch for file deletion: ${watchFileDeletion}`)
 
 // Setup media watcher
 const mediaWatcher = new MediaWatcherConsumer({ sourcePath, watchFileDeletion })

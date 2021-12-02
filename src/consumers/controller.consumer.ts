@@ -2,8 +2,9 @@ import { ConsumerEvent, EventConsumer } from '../utilities/events'
 import { statSync, unlink, existsSync, mkdirSync } from 'fs'
 import { convertPath } from '../utilities/filesystem'
 import { dirname } from 'path'
-import { logger } from '../utilities/logger'
+import { logger as baseLogger } from '../utilities/logger'
 import { volume } from '../utilities/filesystem'
+const logger = baseLogger.tag('Controller consumer')
 
 export interface IControllerConsumer {
   targetPath: string
@@ -47,6 +48,7 @@ export class ControllerConsumer extends EventConsumer {
   }
 
   consume({ event, data, emit }: ConsumerEvent): void {
+    logger.data(data).trace(`Consumes event: ${event}`)
     switch (event) {
       case 'on-air':
         this.setOnAir({ event, data, emit })
@@ -93,12 +95,14 @@ export class ControllerConsumer extends EventConsumer {
     this.isOnAir = true
     this.onAirEndTime = Number(data.endTime)
     if (this.onAirTimer !== null) {
+      logger.trace('ClearInterval')
       clearInterval(this.onAirTimer)
     }
     this.onAirTimer = setInterval(() => {
       if (this.onAirEndTime > Date.now()) {
         return
       }
+      logger.trace('Calling setOffAir from onair timer')
       this.setOffAir(emit)
     }, Number(this.onAirTimerInterval))
     logger.info(`Is now On Air.`)
@@ -136,7 +140,9 @@ export class ControllerConsumer extends EventConsumer {
   }
 
   private cacheForRetransfer(data: any, emit: any) {
-    if (data.target in this.retransferCache) {
+    const isInCache = data.target in this.retransferCache
+    logger.trace(`Is in cache: ${isInCache}`)
+    if (isInCache) {
       if (this.retransferCache[data.target].attempts >= this.numberOfRetransfers) {
         logger.warn(`Maximum retransfer tries reached for file: ${data.target}`)
         delete this.retransferCache[data.target]
@@ -155,11 +161,12 @@ export class ControllerConsumer extends EventConsumer {
   }
 
   private deleteFile({ data: { path } }: ConsumerEvent): void {
-    unlink(path.replace(this.sourcePath, this.targetPath), (err) => {
-      if (err) {
-        logger.error(err)
+    const filePath = path.replace(this.sourcePath, this.targetPath)
+    unlink(filePath, (error) => {
+      if (error) {
+        logger.data(error).error(`Failed to delete file: ${filePath}`)
       } else {
-        logger.info(`File deleted: ${path}`)
+        logger.info(`File deleted: ${filePath}`)
       }
     })
   }
@@ -182,8 +189,8 @@ export class ControllerConsumer extends EventConsumer {
           logger.debug('Transfer event sent: Source file has been updated')
           emit('transfer', { source: sourceFile, target: targetFile })
         }
-      } catch (err) {
-        logger.error(err)
+      } catch (error) {
+        logger.data({ source: sourceFile, target: targetFile, error }).error('Failed to transfer file')
       }
     } else {
       // Transfer file
