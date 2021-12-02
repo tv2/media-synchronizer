@@ -17,6 +17,9 @@
   "scripts": {
     "dev": "nodemon ./src",
     "start": "cross-env NODE_ENV=production node ./dist",
+    "start:stage": "cross-env NODE_ENV=stage node ./dist",
+    "start:dev": "cross-env NODE_ENV=development node ./dist",
+    "start:local": "cross-env NODE_ENV=local node ./dist",
     "clean": "rimraf ./dist",
     "reset": "yarn clean && rimraf ./node_modules",
     "build": "tsc --build && ts-node __tools__/dist-package.ts",
@@ -34,7 +37,7 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@tv2media/logger": "^1.2.0",
+    "@tv2media/logger": "^1.2.1",
     "body-parser": "1.19.0",
     "chokidar": "3.5.2",
     "cross-env": "^7.0.3",
