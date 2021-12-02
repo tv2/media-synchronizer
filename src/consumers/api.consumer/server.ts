@@ -3,8 +3,9 @@ import { Server } from 'http'
 
 import bodyParser from 'body-parser'
 import Joi from 'joi'
-import { logger } from '../../utilities/logger'
+import { logger as baseLogger } from '../../utilities/logger'
 import { eventManager } from '../../event-manager'
+const logger = baseLogger.tag('API consumer')
 
 export function createAPIServer(port: bigint): Server {
   const server = express()
